@@ -177,6 +177,36 @@
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
+
+     firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const noteRef = db.ref('sharedNote');
+    const textarea = document.getElementById('note');
+
+    // Sayfa yüklenirken textarea’yı pasif yapalım, veri gelince aktif olsun
+    textarea.disabled = true;
+    textarea.placeholder = "Notlar yükleniyor...";
+
+    noteRef.once('value').then(snapshot => {
+      const val = snapshot.val() || '';
+      textarea.value = val;
+      textarea.disabled = false;
+      textarea.placeholder = "Buraya notlarını yaz...";
+    });
+
+    // Firebase’den veri değişince textarea güncellensin
+    noteRef.on('value', snapshot => {
+      const val = snapshot.val() || '';
+      if (textarea.value !== val) {
+        textarea.value = val;
+      }
+    });
+
+    // Yazdıkça Firebase’e gönder
+    textarea.addEventListener('input', () => {
+      noteRef.set(textarea.value);
+    });
+  </script>
 </script>
 
 </body>
