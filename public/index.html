@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nazımla Film Gecesi 🎥</title>
+  <style>
+    :root {
+      --primary-light: #1f2937;
+      --secondary-light: #4b5563;
+      --accent-light: #3b82f6;
+      --bg-light: #f9fafb;
+
+      --primary-dark: #e5e7eb;
+      --secondary-dark: #9ca3af;
+      --accent-dark: #3b82f6;
+      --bg-dark: #1f2937;
+    }
+    html, body {
+      margin: 0; padding: 0; height: 100%; width: 100%;
+      font-family: 'Helvetica', sans-serif;
+      overflow: hidden;
+    }
+    body.light {
+      --primary: var(--primary-light);
+      --secondary: var(--secondary-light);
+      --accent: var(--accent-light);
+      --bg: var(--bg-light);
+    }
+    body.dark {
+      --primary: var(--primary-dark);
+      --secondary: var(--secondary-dark);
+      --accent: var(--accent-dark);
+      --bg: var(--bg-dark);
+    }
+    body {
+      background: var(--bg); color: var(--primary);
+      display: flex; flex-direction: column; height: 100vh;
+    }
+    header {
+      background: var(--primary); color: white; padding: 0.5rem;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 1.3rem; font-weight: bold;
+      flex-shrink: 0;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      gap: 10px;
+      padding: 0.5rem;
+      box-sizing: border-box;
+      height: 100%;
+      overflow: hidden;
+    }
+    #videoContainer {
+      flex: 3;
+      background: black;
+      position: relative;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 0.5rem;
+    }
+    .fullscreen-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: rgba(0,0,0,0.5);
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      padding: 0.4rem 0.6rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      z-index: 10;
+    }
+    .controls {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    button {
+      padding: 0.75rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-bottom: 10px;
+    }
+    button:hover {
+      background: #2563eb;
+    }
+    label {
+      margin-bottom: 0.3rem;
+      font-weight: 600;
+    }
+    textarea {
+      flex: 1;
+      width: 100%;
+      max-height: 100%;
+      min-height: 0;
+      overflow-y: auto;
+      resize: none;
+      padding: 0.6rem;
+      border: 1px solid var(--secondary);
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      background: white;
+      color: var(--primary);
+      box-sizing: border-box;
+    }
+    footer {
+      text-align: center;
+      padding: 0.3rem;
+      font-size: 0.8rem;
+      color: var(--secondary);
+      flex-shrink: 0;
+    }
+    .theme-btn {
+      background: transparent;
+      border: 1px solid white;
+      color: white;
+      border-radius: 0.4rem;
+      padding: 0.3rem 0.5rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body class="light">
+  <header>
+    🎥 Nazomu çok seviyom
+    <button class="theme-btn" onclick="toggleTheme()">🌓 Tema Değiştir</button>
+  </header>
+  <main>
+    <div id="videoContainer">
+      <video id="screenVideo" autoplay playsinline></video>
+      <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶ Tam Ekran</button>
+    </div>
+    <div class="controls">
+      <button id="startShare">🖥️ Ekranı Paylaş</button>
+      <label for="note">📝 Ortak Notlar:</label>
+      <textarea id="note" placeholder=""></textarea>
+    </div>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const note = document.getElementById("note");
+
+    note.addEventListener("input", () => {
+      socket.emit("noteUpdate", note.value);
+    });
+
+    socket.on("noteUpdate", (data) => {
+      note.value = data;
+    });
+
+    document.getElementById("startShare").addEventListener("click", async () => {
+      try {
+        const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+        document.getElementById("screenVideo").srcObject = stream;
+      } catch (err) {
+        alert("Ekran paylaşımı başlatılamadı: " + err.message);
+      }
+    });
+
+    function toggleFullscreen() {
+      const videoContainer = document.getElementById("videoContainer");
+      if (!document.fullscreenElement) {
+        videoContainer.requestFullscreen().catch(err => {
+          alert(`Tam ekran başlatılamadı: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      document.body.classList.toggle("light");
+      localStorage.setItem("theme", document.body.className);
+    }
+
+    window.addEventListener("load", () => {
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme) {
+        document.body.className = savedTheme;
+      }
+    });
+  </script>
+</body>
+</html>
