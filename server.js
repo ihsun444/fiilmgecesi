@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static("public")); // Frontend dosyaları burda
+app.use(express.static("public")); // Frontend buradan sunulacak
 
 const NOTES_FILE = "./notes.json";
 
