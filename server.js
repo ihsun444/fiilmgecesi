@@ -1,24 +1,47 @@
-// Node.js sunucusu: WebSocket ile not senkronizasyonu
 const express = require("express");
-const http = require("http");
-const { Server } = require("socket.io");
-
+const fs = require("fs");
+const cors = require("cors");
 const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
+const PORT = process.env.PORT || 3000;
 
-app.use(express.static("public")); // /public klasöründen dosya sun
+app.use(cors());
+app.use(express.json());
+app.use(express.static("public")); // Frontend dosyaları burda
 
-io.on("connection", (socket) => {
-  console.log("Yeni kullanıcı bağlandı");
+const NOTES_FILE = "./notes.json";
 
-  socket.on("noteUpdate", (data) => {
-    socket.broadcast.emit("noteUpdate", data); // diğer herkese yolla
-  });
+// Notlar dosyası yoksa oluştur
+if (!fs.existsSync(NOTES_FILE)) {
+  fs.writeFileSync(NOTES_FILE, "[]", "utf8");
+}
 
-  socket.on("disconnect", () => {
-    console.log("Kullanıcı ayrıldı");
-  });
+// Notları oku
+function readNotes() {
+  const data = fs.readFileSync(NOTES_FILE, "utf8");
+  return JSON.parse(data);
+}
+
+// Notları kaydet
+function saveNotes(notes) {
+  fs.writeFileSync(NOTES_FILE, JSON.stringify(notes, null, 2), "utf8");
+}
+
+// Notları getir
+app.get("/notes", (req, res) => {
+  const notes = readNotes();
+  res.json(notes);
 });
 
-server.listen(3000, () => console.log("http://localhost:3000 adresinde çalışıyor"));
+// Not ekle/güncelle
+app.post("/notes", (req, res) => {
+  const newNotes = req.body;
+  if (!Array.isArray(newNotes)) {
+    return res.status(400).json({ error: "Notes should be an array" });
+  }
+  saveNotes(newNotes);
+  res.json({ status: "success" });
+});
+
+app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
+});
