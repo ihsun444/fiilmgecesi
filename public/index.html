@@ -174,40 +174,31 @@
     measurementId: "G-VZCSNZCMNV"
   };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-
-     firebase.initializeApp(firebaseConfig);
+  firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     const noteRef = db.ref('sharedNote');
     const textarea = document.getElementById('note');
 
-    // Sayfa yüklenirken textarea’yı pasif yapalım, veri gelince aktif olsun
-    note.disabled = true;
-    note.placeholder = "Notlar yükleniyor...";
+    textarea.disabled = true;
+    textarea.placeholder = "Notlar yükleniyor...";
 
     noteRef.once('value').then(snapshot => {
-      const val = snapshot.val() || '';
-      note.value = val;
-      note.disabled = false;
-      note.placeholder = "Buraya notlarını yaz...";
+      textarea.value = snapshot.val() || '';
+      textarea.disabled = false;
+      textarea.placeholder = "Buraya notlarını yaz...";
     });
 
-    // Firebase’den veri değişince textarea güncellensin
     noteRef.on('value', snapshot => {
       const val = snapshot.val() || '';
-      if (note.value !== val) {
-        note.value = val;
+      if (textarea.value !== val) {
+        textarea.value = val;
       }
     });
 
-    // Yazdıkça Firebase’e gönder
-    note.addEventListener('input', () => {
-      noteRef.set(note.value);
+    textarea.addEventListener('input', () => {
+      noteRef.set(textarea.value);
     });
   </script>
-</script>
 
 </body>
 </html>
