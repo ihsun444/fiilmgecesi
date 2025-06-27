@@ -155,27 +155,29 @@
     </div>
   </main>
 
-<script>
-    // Sayfa yüklendiğinde localStorage'dan notu yükle
-    function loadNote() {
-      const savedNote = localStorage.getItem('sharedNote');
-      if (savedNote) {
-        document.getElementById('note').value = savedNote;
-      }
-    }
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
 
-    // Not değiştiğinde localStorage'a kaydet
-    function saveNote() {
-      const noteContent = document.getElementById('note').value;
-      localStorage.setItem('sharedNote', noteContent);
-    }
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyCjG3hrmYs8ACiNpu1lgIbDw1QYYlpW4AU",
+    authDomain: "fiilmgecesi.firebaseapp.com",
+    projectId: "fiilmgecesi",
+    storageBucket: "fiilmgecesi.firebasestorage.app",
+    messagingSenderId: "1040046577822",
+    appId: "1:1040046577822:web:2e459b3b081c27321cc38f",
+    measurementId: "G-VZCSNZCMNV"
+  };
 
-    // Sayfa açıldığında notu yükle
-    window.onload = loadNote;
-
-    // Her yazma işleminde kaydet
-    document.getElementById('note').addEventListener('input', saveNote);
-  </script>
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
 
 </body>
 </html>
