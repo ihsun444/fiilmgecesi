@@ -156,40 +156,26 @@
   </main>
 
 <script>
-const notesTextarea = document.getElementById("notes");
+    // Sayfa yüklendiğinde localStorage'dan notu yükle
+    function loadNote() {
+      const savedNote = localStorage.getItem('sharedNote');
+      if (savedNote) {
+        document.getElementById('note').value = savedNote;
+      }
+    }
 
-// Notları yükle
-async function loadNotes() {
-  try {
-    const res = await fetch("/notes");
-    const notes = await res.json();
-    notesTextarea.value = notes.join("\n");
-  } catch (e) {
-    console.error("Notlar yüklenemedi", e);
-  }
-}
+    // Not değiştiğinde localStorage'a kaydet
+    function saveNote() {
+      const noteContent = document.getElementById('note').value;
+      localStorage.setItem('sharedNote', noteContent);
+    }
 
-// Notları kaydet
-async function saveNotes() {
-  const notes = notesTextarea.value.split("\n");
-  try {
-    await fetch("/notes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(notes),
-    });
-  } catch (e) {
-    console.error("Notlar kaydedilemedi", e);
-  }
-}
+    // Sayfa açıldığında notu yükle
+    window.onload = loadNote;
 
-notesTextarea.addEventListener("input", () => {
-  saveNotes();
-});
+    // Her yazma işleminde kaydet
+    document.getElementById('note').addEventListener('input', saveNote);
+  </script>
 
-window.onload = () => {
-  loadNotes();
-};
-</script>
 </body>
 </html>
