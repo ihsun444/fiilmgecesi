@@ -52,7 +52,7 @@
       height: 100%;
       overflow: hidden;
     }
-    videoContainer {
+    #videoContainer {
       flex: 3;
       background: black;
       position: relative;
@@ -150,58 +150,56 @@
     </div>
     <div class="controls">
       <button id="startShare">🖥️ Ekranı Paylaş</button>
-
-
-      
       <label for="note">📝 Ortak Notlar:</label>
       <textarea id="note" placeholder=""></textarea>
     </div>
   </main>
 
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const note = document.getElementById("note");
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyCjG3hrmYs8ACiNpu1lgIbDw1QYYlpW4AU",
-    authDomain: "fiilmgecesi.firebaseapp.com",
-    projectId: "fiilmgecesi",
-    storageBucket: "fiilmgecesi.firebasestorage.app",
-    messagingSenderId: "1040046577822",
-    appId: "1:1040046577822:web:2e459b3b081c27321cc38f",
-    measurementId: "G-VZCSNZCMNV"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const noteRef = db.ref('sharedNote');
-    const textarea = document.getElementById('note');
-
-    textarea.disabled = true;
-    textarea.placeholder = "Notlar yükleniyor...";
-
-    noteRef.once('value').then(snapshot => {
-      textarea.value = snapshot.val() || '';
-      textarea.disabled = false;
-      textarea.placeholder = "Buraya notlarını yaz...";
+    note.addEventListener("input", () => {
+      socket.emit("noteUpdate", note.value);
     });
 
-    noteRef.on('value', snapshot => {
-      const val = snapshot.val() || '';
-      if (textarea.value !== val) {
-        textarea.value = val;
+    socket.on("noteUpdate", (data) => {
+      note.value = data;
+    });
+
+    document.getElementById("startShare").addEventListener("click", async () => {
+      try {
+        const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+        document.getElementById("screenVideo").srcObject = stream;
+      } catch (err) {
+        alert("Ekran paylaşımı başlatılamadı: " + err.message);
       }
     });
 
-    textarea.addEventListener('input', () => {
-      noteRef.set(textarea.value);
+    function toggleFullscreen() {
+      const videoContainer = document.getElementById("videoContainer");
+      if (!document.fullscreenElement) {
+        videoContainer.requestFullscreen().catch(err => {
+          alert(`Tam ekran başlatılamadı: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      document.body.classList.toggle("light");
+      localStorage.setItem("theme", document.body.className);
+    }
+
+    window.addEventListener("load", () => {
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme) {
+        document.body.className = savedTheme;
+      }
     });
   </script>
-
 </body>
 </html>
