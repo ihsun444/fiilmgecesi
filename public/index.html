@@ -150,6 +150,19 @@
     </div>
     <div class="controls">
       <button id="startShare">🖥️ Ekranı Paylaş</button>
+        <video id="screenVideo" autoplay playsinline></video>
+
+<script>
+    document.getElementById("startShare").addEventListener("click", async () => {
+      try {
+        const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+        document.getElementById("screenVideo").srcObject = stream;
+      } catch (err) {
+        alert("Ekran paylaşımı başlatılamadı: " + err.message);
+      }
+    });
+  </script>
+      
       <label for="note">📝 Ortak Notlar:</label>
       <textarea id="note" placeholder=""></textarea>
     </div>
