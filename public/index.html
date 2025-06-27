@@ -136,27 +136,6 @@
       cursor: pointer;
       flex-shrink: 0;
     }
-chat-container {
-    position: fixed;        /* Ekrana sabitler */
-    top: 10px;              /* Üstten boşluk */
-    right: 10px;            /* Sağdan boşluk */
-    width: 300px;
-    background: white;
-    border: 1px solid #ccc;
-    box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    z-index: 9999;
-    padding: 5px;
-  }
-  chat-box {
-    height: 200px;
-    overflow-y: auto;
-    border: 1px solid #eee;
-    padding: 5px;
-    margin-bottom: 5px;
-  }
-  msg {
-    width: 200px;
-  }
 
   
 	
@@ -177,49 +156,7 @@ chat-container {
     </div>
   </main>
 
-<div id="chat-box" </div>
-<input id="msg" type="text" placeholder="Mesaj yaz..."  />
-<button onclick="sendMsg()">Gönder</button>
 
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-
-<script>
-  const firebaseConfig = {
-  apiKey: "AIzaSyCjG3hrmYs8ACiNpu1lgIbDw1QYYlpW4AU",
-  authDomain: "fiilmgecesi.firebaseapp.com",
-  projectId: "fiilmgecesi",
-  storageBucket: "fiilmgecesi.firebasestorage.app",
-  messagingSenderId: "1040046577822",
-  appId: "1:1040046577822:web:2e459b3b081c27321cc38f",
-  measurementId: "G-VZCSNZCMNV"
-};
-
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-
-  const chatBox = document.getElementById('chat-box');
-  const msgInput = document.getElementById('msg');
-
-  function sendMsg() {
-    const text = msgInput.value.trim();
-    if(!text) return;
-    const newMsgRef = db.ref('chat').push();
-    newMsgRef.set({
-      text: text,
-      timestamp: Date.now()
-    });
-    msgInput.value = '';
-  }
-
-  db.ref('chat').on('child_added', snapshot => {
-    const data = snapshot.val();
-    const div = document.createElement('div');
-    div.textContent = data.text;
-    chatBox.appendChild(div);
-    chatBox.scrollTop = chatBox.scrollHeight;
-  });
-</script>
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
